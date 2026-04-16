@@ -1,0 +1,11 @@
+{
+  "project": "PDF Hosting",
+  "files": [
+    {
+      "name": "micheal.pdf",
+      "path": "/micheal.pdf",
+      "type": "application/pdf"
+    }
+  ],
+  "status": "active"
+}
