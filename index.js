@@ -1,16 +1,16 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const Database = require('better-sqlite3');
+const { DatabaseSync } = require('node:sqlite'); // <-- Using Node's native SQLite!
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Initialize SQLite Database instead of Supabase
-const db = new Database('database.db');
+// Initialize Native SQLite Database
+const db = new DatabaseSync('database.db');
 
-// Create table if it doesn't exist
-db.prepare(`
+// Create table if it doesn't exist (using .exec() instead of .run())
+db.exec(`
   CREATE TABLE IF NOT EXISTS files (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     filename TEXT UNIQUE,
@@ -18,7 +18,7 @@ db.prepare(`
     visit_count INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )
-`).run();
+`);
 
 // Seed initial data if table is empty
 const rowCount = db.prepare('SELECT count(*) as count FROM files').get();
@@ -27,6 +27,8 @@ if (rowCount.count === 0) {
   insert.run('faith.pdf', 'Faith Document');
   insert.run('micheal.pdf', 'Michael Portfolio');
 }
+
+// ... keep the rest of your index.js code exactly as it is from here down!
 
 // Dashboard HTML
 function renderDashboard(files) {
