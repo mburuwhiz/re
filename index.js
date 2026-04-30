@@ -1,14 +1,32 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
-const { createClient } = require('@supabase/supabase-js');
+const Database = require('better-sqlite3');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Initialize SQLite Database instead of Supabase
+const db = new Database('database.db');
+
+// Create table if it doesn't exist
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT UNIQUE,
+    display_name TEXT,
+    visit_count INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+  )
+`).run();
+
+// Seed initial data if table is empty
+const rowCount = db.prepare('SELECT count(*) as count FROM files').get();
+if (rowCount.count === 0) {
+  const insert = db.prepare('INSERT INTO files (filename, display_name) VALUES (?, ?)');
+  insert.run('faith.pdf', 'Faith Document');
+  insert.run('micheal.pdf', 'Michael Portfolio');
+}
 
 // Dashboard HTML
 function renderDashboard(files) {
@@ -474,14 +492,10 @@ function renderSplash(filename, displayName) {
 </html>`;
 }
 
-// Dashboard route
-app.get('/', async (req, res) => {
+// Dashboard route (updated to use SQLite)
+app.get('/', (req, res) => {
   try {
-    const { data: files, error } = await supabase
-      .from('files')
-      .select('*')
-      .order('created_at', { ascending: true });
-    if (error) throw error;
+    const files = db.prepare('SELECT * FROM files ORDER BY created_at ASC').all();
     res.send(renderDashboard(files || []));
   } catch (err) {
     console.error('Dashboard error:', err);
@@ -489,8 +503,8 @@ app.get('/', async (req, res) => {
   }
 });
 
-// PDF interceptor & streaming serve route
-app.get('/:filename', async (req, res) => {
+// PDF interceptor & streaming serve route (updated to use SQLite)
+app.get('/:filename', (req, res) => {
   const { filename } = req.params;
 
   if (!filename.toLowerCase().endsWith('.pdf')) {
@@ -504,20 +518,12 @@ app.get('/:filename', async (req, res) => {
   }
 
   if (req.query.download === 'true') {
-    // Increment visit count (fire-and-forget)
-    supabase
-      .from('files')
-      .select('id, visit_count')
-      .eq('filename', filename)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (data) {
-          supabase.from('files')
-            .update({ visit_count: data.visit_count + 1 })
-            .eq('id', data.id);
-        }
-      })
-      .catch(err => console.error('Visit count error:', err));
+    // Increment visit count using SQLite (fire-and-forget)
+    try {
+      db.prepare('UPDATE files SET visit_count = visit_count + 1 WHERE filename = ?').run(filename);
+    } catch (err) {
+      console.error('Visit count error:', err);
+    }
 
     // Stream the PDF
     res.setHeader('Content-Type', 'application/pdf');
@@ -529,11 +535,7 @@ app.get('/:filename', async (req, res) => {
 
   // Show splash/interstitial
   try {
-    const { data: fileRecord } = await supabase
-      .from('files')
-      .select('display_name')
-      .eq('filename', filename)
-      .maybeSingle();
+    const fileRecord = db.prepare('SELECT display_name FROM files WHERE filename = ?').get(filename);
     const displayName = fileRecord?.display_name || filename.replace('.pdf', '');
     res.send(renderSplash(filename, displayName));
   } catch (err) {
