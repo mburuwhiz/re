@@ -1,14 +1,12 @@
 {
   "name": "pdf-host-server",
   "version": "1.0.0",
-  "description": "Whizpoint PDF Host with SQLite tracking",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build": "echo 'No build step required'"
+    "build": "echo 'No build required'"
   },
   "dependencies": {
-    "better-sqlite3": "^11.0.0",
     "express": "^4.18.2"
   }
 }
