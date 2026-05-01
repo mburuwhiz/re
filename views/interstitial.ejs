@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preparing your file...</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 flex items-center justify-center min-h-screen text-gray-800 font-sans p-4">
+    <div class="bg-white p-8 md:p-12 rounded-2xl shadow-xl max-w-lg w-full text-center border border-gray-100">
+
+        <div class="flex justify-center mb-6">
+            <div class="loader"></div>
+        </div>
+
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-blue-600">File is being prepared</h1>
+
+        <p class="text-gray-600 mb-6">
+            You are about to visit:<br>
+            <span class="font-semibold text-gray-900 break-all bg-gray-100 px-2 py-1 rounded inline-block mt-2"><%= fullUrl %></span>
+        </p>
+
+        <div class="text-5xl font-extrabold text-blue-600 my-8" id="countdown">10</div>
+
+        <p class="text-gray-500 mb-8">Please wait while we get your file ready...</p>
+
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-6 shadow-inner">
+            <h3 class="font-bold text-blue-800 mb-2 text-lg">Need Assistance?</h3>
+            <p class="text-blue-700">For any Cyber, iTax, or E-Citizen services, please text or call:</p>
+            <p class="text-2xl font-black text-blue-900 mt-2 tracking-wide">0740841168</p>
+            <p class="text-sm text-blue-600 mt-2 font-medium">Thank you!</p>
+        </div>
+    </div>
+
+    <script>
+        let timeLeft = 10;
+        const countdownEl = document.getElementById('countdown');
+        const redirectUrl = `/${encodeURIComponent('<%= filename %>')}?download=true`;
+
+        const timer = setInterval(() => {
+            timeLeft--;
+            countdownEl.textContent = timeLeft;
+
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                window.location.href = redirectUrl;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
