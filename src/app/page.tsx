@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 export default function LandingPage() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
@@ -39,20 +40,55 @@ export default function LandingPage() {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-sm py-4' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 text-2xl font-bold tracking-tight">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-600">
-              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-            </svg>
-            <span>FlipDocs</span>
+            <img src="/logo.png" alt="Whizpoint Flipbook Logo" className="w-8 h-8 rounded-lg object-contain" />
+            <span>Whizpoint Flipbook</span>
           </Link>
+          
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
             <a href="#features" className="hover:text-blue-600 transition-colors">Features</a>
-            <a href="#gallery" className="hover:text-blue-600 transition-colors">Gallery</a>
+            <Link href="/gallery" className="hover:text-blue-600 transition-colors">Gallery</Link>
             <a href="#about" className="hover:text-blue-600 transition-colors">About</a>
           </nav>
-          <Link href="/admin/login" className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
-            Admin
-          </Link>
+
+          <div className="flex items-center gap-4">
+            <Link href="/auth/login" className="hidden md:flex bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-slate-800 transition-colors shadow-sm">
+              Login
+            </Link>
+            
+            <button 
+              className="md:hidden p-2 text-slate-600 hover:text-slate-900"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                {mobileMenuOpen ? (
+                  <>
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </>
+                ) : (
+                  <>
+                    <line x1="3" y1="12" x2="21" y2="12" />
+                    <line x1="3" y1="6" x2="21" y2="6" />
+                    <line x1="3" y1="18" x2="21" y2="18" />
+                  </>
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white border-t border-slate-100 shadow-lg px-6 py-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
+            <a href="#features" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-600 font-medium">Features</a>
+            <Link href="/gallery" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-600 font-medium">Gallery</Link>
+            <a href="#about" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-slate-600 font-medium">About</a>
+            <div className="h-px bg-slate-100 my-2"></div>
+            <Link href="/auth/login" className="block w-full text-center bg-slate-900 text-white px-5 py-3 rounded-xl font-medium shadow-sm">
+              Login / Get Started
+            </Link>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -66,19 +102,24 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
           <div className="flex-1 text-center lg:text-left">
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-slate-900 leading-[1.1] mb-6 animate-fade-in-up">
-              Your Print Spreads,<br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Now Interactive</span>
+              Bring Your Print Spreads <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">To Life Instantly</span>
             </h1>
-            <p className="text-lg md:text-xl text-slate-600 mb-10 max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-100">
-              Transform A3 booklet print-spreads into stunning digital flipbooks. Share with a link, read on any device.
+            <p className="text-lg md:text-xl text-slate-600 mb-6 max-w-2xl mx-auto lg:mx-0 animate-fade-in-up delay-100">
+              Transform standard A3 booklet PDFs into stunning, highly interactive digital flipbooks. Deliver a premium reading experience that works flawlessly on any device.
             </p>
+            <ul className="text-left max-w-2xl mx-auto lg:mx-0 text-slate-600 space-y-2 mb-10 animate-fade-in-up delay-150">
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Zero server delays with browser-based processing</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Customizable auto-expiry & secure storage</li>
+              <li className="flex items-center gap-2"><svg className="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg> Generate branded QR codes instantly</li>
+            </ul>
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 animate-fade-in-up delay-200">
-              <Link href="/admin/login" className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3.5 rounded-full font-medium hover:bg-blue-700 transition-colors shadow-md shadow-blue-200">
+              <Link href="/auth/login" className="w-full sm:w-auto bg-blue-600 text-white px-8 py-3.5 rounded-full font-medium hover:bg-blue-700 transition-colors shadow-md shadow-blue-200">
                 Get Started
               </Link>
-              <a href="#gallery" className="w-full sm:w-auto bg-white text-slate-700 border border-slate-200 px-8 py-3.5 rounded-full font-medium hover:bg-slate-50 transition-colors">
+              <Link href="/gallery" className="w-full sm:w-auto bg-white text-slate-700 border border-slate-200 px-8 py-3.5 rounded-full font-medium hover:bg-slate-50 transition-colors">
                 Explore Gallery
-              </a>
+              </Link>
             </div>
           </div>
           
@@ -125,7 +166,7 @@ export default function LandingPage() {
       <section id="features" className="py-24 bg-slate-50 px-6">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16 animate-on-scroll opacity-0-init">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">Why FlipDocs?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-4">Why Whizpoint Flipbook?</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">Everything you need to deliver a premium reading experience without the overhead of complex hosting.</p>
           </div>
           
@@ -169,54 +210,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <section id="gallery" className="py-24 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-12 animate-on-scroll opacity-0-init">
-            <div>
-              <h2 className="text-4xl font-bold tracking-tight text-slate-900 mb-2">Document Gallery</h2>
-              <p className="text-lg text-slate-500">Explore featured digital publications.</p>
-            </div>
-            <Link href="/gallery" className="hidden sm:flex items-center gap-1 text-blue-600 font-medium hover:text-blue-700">
-              View All
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="5" y1="12" x2="19" y2="12" />
-                <polyline points="12 5 19 12 12 19" />
-              </svg>
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((item, index) => (
-              <div key={item} className={`group rounded-2xl overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 animate-on-scroll opacity-0-init`} style={{ animationDelay: `${(index % 3) * 100}ms` }}>
-                <div className="aspect-[3/4] bg-gradient-to-br from-slate-50 to-slate-200 relative overflow-hidden flex items-center justify-center">
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                  <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-slate-400 group-hover:scale-110 transition-transform duration-500 relative z-10">
-                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
-                  </svg>
-                </div>
-                <div className="p-6 bg-white border-t border-slate-100">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="h-5 w-2/3 bg-slate-200 rounded"></div>
-                    <div className="h-5 w-1/4 bg-slate-100 rounded"></div>
-                  </div>
-                  <div className="h-4 w-full bg-slate-100 rounded mb-6"></div>
-                  <div className="flex items-center text-blue-600 font-medium group-hover:translate-x-1 transition-transform">
-                    Read Document <span className="ml-1">→</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-12 text-center sm:hidden">
-            <Link href="/gallery" className="inline-flex items-center gap-1 text-blue-600 font-medium hover:text-blue-700">
-              View All Documents →
-            </Link>
-          </div>
-        </div>
-      </section>
-      
+
       {/* Footer */}
       <footer className="border-t border-slate-100 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -224,10 +218,10 @@ export default function LandingPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-slate-500">
               <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
             </svg>
-            <span>FlipDocs</span>
+            <span>Whizpoint Flipbook</span>
           </div>
           <p className="text-slate-500 text-sm">
-            Built with FlipDocs · © 2026
+            Built with Whizpoint Flipbook · © 2026
           </p>
         </div>
       </footer>

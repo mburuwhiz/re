@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                  String     @id @default(uuid())
+  email               String     @unique
+  name                String
+  password_hash       String?
+  google_id           String?    @unique
+  reset_token         String?    @unique
+  reset_token_expires DateTime?
+  is_email_verified   Boolean    @default(false)
+  verification_token  String?    @unique
+  plan                String     @default("FREE")
+  created_at          DateTime   @default(now())
+  updated_at          DateTime   @updatedAt
+  documents           Document[]
+}
+
+model Document {
+  id                 String    @id @default(uuid())
+  user_id            String
+  title              String
+  slug               String    @unique
+  page_count         Int
+  pages              String[]  // Array of image URLs in R2
+  logo_url           String?   // Custom Favicon/Logo URL in R2
+  visibility         String    @default("Public") // Public, Pinned, Unlisted
+  custom_expiry_date DateTime? 
+  is_expired         Boolean   @default(false)
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+  @@index([user_id])
+}

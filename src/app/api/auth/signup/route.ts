@@ -1,0 +1,48 @@
+import { NextResponse } from 'next/server';
+import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
+import prisma from '@/lib/db';
+import { sendVerificationEmail } from '@/lib/email';
+
+export async function POST(req: Request) {
+  try {
+    const { name, email, password } = await req.json();
+
+    if (!name || !email || !password) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(password, salt);
+    const verification_token = crypto.randomBytes(32).toString('hex');
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password_hash,
+        verification_token,
+      },
+    });
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://api.whizpoint.app';
+    const verifyLink = `${baseUrl}/auth/verify?token=${verification_token}`;
+    sendVerificationEmail(email, name, verifyLink).catch(console.error);
+
+    return NextResponse.json(
+      { message: 'User created successfully. Please check your email to verify your account.' },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.error('Signup error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
