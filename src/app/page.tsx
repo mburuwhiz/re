@@ -220,8 +220,12 @@ export default function LandingPage() {
             </svg>
             <span>Whizpoint Flipbook</span>
           </div>
-          <p className="text-slate-500 text-sm">
-            Built with Whizpoint Flipbook · © 2026
+          <div className="flex items-center gap-6 text-sm text-slate-500 font-medium">
+            <Link href="/privacy" className="hover:text-slate-900 transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms of Service</Link>
+          </div>
+          <p className="text-sm text-slate-500 font-medium">
+            Built with Whizpoint Flipbook &copy; {new Date().getFullYear()}
           </p>
         </div>
       </footer>
